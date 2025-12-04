@@ -133,16 +133,32 @@
         } catch (e) { alert("Connection Error: " + e); }
     }
 
-    // Helper to send POST data
+// REPLACE YOUR EXISTING postData FUNCTION WITH THIS
     async function postData(payload) {
         document.getElementById('loading').style.display = 'block';
-        const res = await fetch(API_URL, {
-            method: "POST",
-            body: JSON.stringify(payload)
-        });
-        const json = await res.json();
-        document.getElementById('loading').style.display = 'none';
-        return json;
+        
+        try {
+            // We use 'no-cors' trickery by sending plain text
+            // This prevents the browser from doing a security "Preflight" check
+            const res = await fetch(API_URL, {
+                method: "POST",
+                redirect: "follow", // Handle Google's 302 redirects
+                headers: {
+                    "Content-Type": "text/plain;charset=utf-8", // Force plain text
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const json = await res.json();
+            document.getElementById('loading').style.display = 'none';
+            return json;
+
+        } catch (error) {
+            document.getElementById('loading').style.display = 'none';
+            alert("Error: " + error);
+            console.error(error);
+            return { status: "error", message: error };
+        }
     }
 
     async function submitLoan() {
