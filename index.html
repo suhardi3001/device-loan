@@ -1,26 +1,27 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ms">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Device Loan System</title>
+    <title>Sistem Pinjaman Peranti</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { padding: 20px; background-color: #f8f9fa; }
         .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); max-width: 800px; margin: 0 auto; }
         .nav-tabs { margin-bottom: 20px; }
         #loading { display:none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.8); z-index: 9999; text-align: center; padding-top: 200px; }
-        .modal-header-danger { background-color: #dc3545; color: white; }
+        /* Style untuk butab disabled */
+        button:disabled { cursor: not-allowed; opacity: 0.6; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 class="mb-4 text-center">Device Loan System</h2>
+    <h2 class="mb-4 text-center">Sistem Pinjaman Peranti</h2>
 
     <ul class="nav nav-tabs" id="myTab" role="tablist">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loan">Loan</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#return">Return</button></li>
+        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#loan">Pinjam</button></li>
+        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#return">Pulang</button></li>
         <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#admin">Admin</button></li>
     </ul>
 
@@ -29,134 +30,192 @@
             <form id="loanForm">
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label>User Name</label>
-                        <input class="form-control" list="userList" id="userName" required placeholder="Search...">
+                        <label>Nama Pengguna</label>
+                        <input class="form-control" list="userList" id="userName" required placeholder="Cari nama...">
                         <datalist id="userList"></datalist>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label>Device</label>
-                        <select class="form-select" id="deviceSelect" required><option disabled selected>Loading...</option></select>
+                        <label>Pilih Peranti</label>
+                        <select class="form-select" id="deviceSelect" required>
+                            <option value="" disabled selected>Sedang memuatkan...</option>
+                        </select>
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-6 mb-3"><label>Start</label><input type="date" class="form-control" id="startDate" required></div>
-                    <div class="col-md-6 mb-3"><label>End</label><input type="date" class="form-control" id="endDate" required></div>
+                    <div class="col-md-6 mb-3">
+                        <label>Tarikh Mula</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Tarikh Tamat</label>
+                        <input type="date" class="form-control" id="endDate" required>
+                    </div>
                 </div>
                 <div class="mb-3">
-                    <label>Context</label>
-                    <select class="form-select" id="usageType"><option>Internal Use</option><option>Outside Use</option></select>
+                    <label>Jenis Kegunaan</label>
+                    <select class="form-select" id="usageType" required>
+                        <option value="" disabled selected>Sila Pilih...</option>
+                        <option value="Kegunaan Dalaman">Kegunaan Dalaman (Pejabat/Kampus)</option>
+                        <option value="Kegunaan Luar">Kegunaan Luar (Remote/Field)</option>
+                    </select>
                 </div>
-                <div class="mb-3"><label>Details</label><textarea class="form-control" id="usageDetails"></textarea></div>
-                <button type="button" onclick="submitLoan()" class="btn btn-primary w-100">Submit Loan</button>
+                <div class="mb-3">
+                    <label>Butiran / Tujuan <span class="text-muted">(Pilihan)</span></label>
+                    <textarea class="form-control" id="usageDetails" placeholder="Contoh: Mesyuarat Projek A"></textarea>
+                </div>
+                
+                <button type="button" id="btnSubmitLoan" onclick="submitLoan()" class="btn btn-primary w-100" disabled>Hantar Permohonan</button>
             </form>
         </div>
 
         <div class="tab-pane fade" id="return">
             <div class="card bg-light border-primary p-3">
-                <h5>Return Device</h5>
-                <select class="form-select mb-3" id="returnSelect"><option disabled selected>Loading...</option></select>
-                <button onclick="submitReturn()" class="btn btn-success w-100">Confirm Return</button>
+                <h5>Pulangkan Peranti</h5>
+                <p class="small text-muted">Pilih peranti yang ingin dipulangkan dari senarai di bawah.</p>
+                <select class="form-select mb-3" id="returnSelect">
+                    <option value="" disabled selected>Sedang memuatkan...</option>
+                </select>
+                <button onclick="submitReturn()" class="btn btn-success w-100">Sahkan Pulangan</button>
             </div>
         </div>
 
         <div class="tab-pane fade" id="admin">
             <div id="loginPanel" class="text-center">
-                <h4>Admin Login</h4>
+                <h4>Log Masuk Admin</h4>
                 <div class="input-group mb-3">
-                    <input type="password" id="adminPass" class="form-control" placeholder="Password">
-                    <button class="btn btn-dark" onclick="verifyAdmin()">Unlock</button>
+                    <input type="password" id="adminPass" class="form-control" placeholder="Kata Laluan">
+                    <button class="btn btn-dark" onclick="verifyAdmin()">Buka</button>
                 </div>
             </div>
             <div id="adminPanel" style="display:none;">
-                <div class="d-flex justify-content-between mb-3"><h5 class="text-success">Logged In</h5><button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">Lock</button></div>
+                <div class="d-flex justify-content-between mb-3">
+                    <h5 class="text-success">Akses Dibenarkan</h5>
+                    <button class="btn btn-sm btn-outline-secondary" onclick="location.reload()">Kunci Semula</button>
+                </div>
                 <div class="row g-2">
                     <div class="col-md-6 p-2 border rounded">
-                        <h6>Add User</h6>
-                        <input id="newUserName" class="form-control mb-2" placeholder="Name">
-                        <button onclick="addUser()" class="btn btn-sm btn-secondary w-100">Add</button>
+                        <h6>Tambah Pengguna</h6>
+                        <input id="newUserName" class="form-control mb-2" placeholder="Nama Penuh">
+                        <button onclick="addUser()" class="btn btn-sm btn-secondary w-100">Tambah</button>
                     </div>
                     <div class="col-md-6 p-2 border rounded">
-                        <h6>Add Device</h6>
-                        <input id="newTag" class="form-control mb-1" placeholder="Tag">
-                        <select id="newType" class="form-select mb-1"><option>Notebook</option><option>Projector</option><option>HDMI Cable</option><option>Webcam</option></select>
-                        <input id="newSerial" class="form-control mb-1" placeholder="Serial">
-                        <button onclick="addDevice()" class="btn btn-sm btn-secondary w-100">Add</button>
+                        <h6>Tambah Peranti</h6>
+                        <input id="newTag" class="form-control mb-1" placeholder="Tag (Cth: NB-01)">
+                        <select id="newType" class="form-select mb-1">
+                            <option>Notebook</option><option>Projector</option><option>HDMI Cable</option><option>Webcam</option>
+                        </select>
+                        <input id="newSerial" class="form-control mb-1" placeholder="No. Siri">
+                        <button onclick="addDevice()" class="btn btn-sm btn-secondary w-100">Tambah</button>
                     </div>
                 </div>
                 <hr>
-                <button class="btn btn-danger w-100" onclick="resetAll()">⚠ RESET SYSTEM</button>
+                <button class="btn btn-danger w-100" onclick="resetAll()">⚠ RESET SISTEM</button>
+                <small class="text-danger d-block text-center mt-2">Ini akan menukar semua status kepada "Tersedia"</small>
             </div>
         </div>
     </div>
 </div>
 
-<div id="loading"><div class="spinner-border text-primary"></div><br>Processing...</div>
+<div id="loading"><div class="spinner-border text-primary"></div><br>Sedang Memproses...</div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    // *** PASTE YOUR DEPLOYMENT URL HERE ***
+    // *** MASUKKAN URL DEPLOYMENT ANDA DI SINI (Pastikan akhiran /exec) ***
     const API_URL = "https://script.google.com/macros/s/AKfycbzm1Dwo6NSbMSs1nZT4K51J09UWff7QjriM93mYOpR8RUTReLEB5UwvjdvKmNiNvh8LZQ/exec";
     
     let sessionPass = "";
 
-    window.onload = loadData;
+    window.onload = function() {
+        loadData();
+        setupValidation(); // Jalankan fungsi validasi
+    };
+
+    // --- LOGIK VALIDASI BUTANG ---
+    function setupValidation() {
+        const fields = ['userName', 'deviceSelect', 'startDate', 'endDate', 'usageType'];
+        const btn = document.getElementById('btnSubmitLoan');
+
+        fields.forEach(id => {
+            const el = document.getElementById(id);
+            // Semak setiap kali input berubah
+            el.addEventListener('input', checkForm);
+            el.addEventListener('change', checkForm);
+        });
+
+        function checkForm() {
+            const user = document.getElementById('userName').value;
+            const device = document.getElementById('deviceSelect').value;
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            const type = document.getElementById('usageType').value;
+
+            // Jika semua ada nilai, buang disabled
+            if(user && device && start && end && type) {
+                btn.disabled = false;
+            } else {
+                btn.disabled = true;
+            }
+        }
+    }
 
     async function loadData() {
         try {
+            document.getElementById('loading').style.display = 'block';
             const res = await fetch(API_URL + "?action=getData");
             const data = await res.json();
             
-            // Populate Users
+            // 1. Senarai Pengguna
             const uList = document.getElementById('userList');
             uList.innerHTML = '';
-            data.users.forEach(u => {
-                let opt = document.createElement('option'); opt.value = u; uList.appendChild(opt);
-            });
+            if(data.users) {
+                data.users.forEach(u => {
+                    let opt = document.createElement('option'); opt.value = u; uList.appendChild(opt);
+                });
+            }
 
-            // Populate Available
+            // 2. Peranti Tersedia (Pinjam)
             const dSel = document.getElementById('deviceSelect');
-            dSel.innerHTML = '<option disabled selected>Select Device...</option>';
-            data.inventory.forEach(d => {
-                let opt = document.createElement('option');
-                opt.value = d[0]; opt.text = `${d[0]} | ${d[2]} | ${d[1]}`;
-                dSel.appendChild(opt);
-            });
+            dSel.innerHTML = '<option value="" disabled selected>Sila Pilih Peranti...</option>';
+            if(data.inventory) {
+                data.inventory.forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d[0]; opt.text = `${d[0]} | ${d[2]} | ${d[1]}`;
+                    dSel.appendChild(opt);
+                });
+            }
 
-            // Populate Returns
+            // 3. Peranti Dipinjam (Pulang)
             const rSel = document.getElementById('returnSelect');
-            rSel.innerHTML = '<option disabled selected>Select Device to Return...</option>';
-            data.loaned.forEach(d => {
-                let opt = document.createElement('option');
-                opt.value = d[0]; opt.text = `${d[0]} | ${d[2]} | ${d[1]}`;
-                rSel.appendChild(opt);
-            });
-        } catch (e) { alert("Connection Error: " + e); }
+            rSel.innerHTML = '<option value="" disabled selected>Pilih Peranti Dipinjam...</option>';
+            if(data.loaned) {
+                data.loaned.forEach(d => {
+                    let opt = document.createElement('option');
+                    opt.value = d[0]; opt.text = `${d[0]} | ${d[2]} | ${d[1]}`;
+                    rSel.appendChild(opt);
+                });
+            }
+            document.getElementById('loading').style.display = 'none';
+        } catch (e) { 
+            document.getElementById('loading').style.display = 'none';
+            alert("Ralat Sambungan: " + e); 
+        }
     }
 
-// REPLACE YOUR EXISTING postData FUNCTION WITH THIS
     async function postData(payload) {
         document.getElementById('loading').style.display = 'block';
-        
         try {
-            // We use 'no-cors' trickery by sending plain text
-            // This prevents the browser from doing a security "Preflight" check
             const res = await fetch(API_URL, {
                 method: "POST",
-                redirect: "follow", // Handle Google's 302 redirects
-                headers: {
-                    "Content-Type": "text/plain;charset=utf-8", // Force plain text
-                },
+                redirect: "follow",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
                 body: JSON.stringify(payload)
             });
-
             const json = await res.json();
             document.getElementById('loading').style.display = 'none';
             return json;
-
         } catch (error) {
             document.getElementById('loading').style.display = 'none';
-            alert("Error: " + error);
-            console.error(error);
+            alert("Ralat: " + error);
             return { status: "error", message: error };
         }
     }
@@ -173,11 +232,17 @@
         };
         const res = await postData(payload);
         alert(res.message);
+        // Reset borang dan disable butang semula
+        document.getElementById('loanForm').reset();
+        document.getElementById('btnSubmitLoan').disabled = true;
         loadData();
     }
 
     async function submitReturn() {
-        const payload = { action: 'processReturn', assetTag: document.getElementById('returnSelect').value };
+        const tag = document.getElementById('returnSelect').value;
+        if(!tag) return alert("Sila pilih peranti dahulu.");
+        
+        const payload = { action: 'processReturn', assetTag: tag };
         const res = await postData(payload);
         alert(res.message);
         loadData();
@@ -191,14 +256,16 @@
             document.getElementById('loginPanel').style.display = 'none';
             document.getElementById('adminPanel').style.display = 'block';
         } else {
-            alert("Wrong Password");
+            alert("Kata Laluan Salah");
         }
     }
 
     async function addUser() {
         const name = document.getElementById('newUserName').value;
+        if(!name) return alert("Sila masukkan nama");
         const res = await postData({ action: 'addUser', name: name, password: sessionPass });
         alert(res.message);
+        document.getElementById('newUserName').value = '';
         loadData();
     }
 
@@ -206,13 +273,17 @@
         const tag = document.getElementById('newTag').value;
         const type = document.getElementById('newType').value;
         const serial = document.getElementById('newSerial').value;
+        if(!tag || !serial) return alert("Sila isi semua maklumat");
+        
         const res = await postData({ action: 'addDevice', tag: tag, type: type, serial: serial, password: sessionPass });
         alert(res.message);
+        document.getElementById('newTag').value = '';
+        document.getElementById('newSerial').value = '';
         loadData();
     }
 
     async function resetAll() {
-        if(!confirm("Are you sure? This resets everything.")) return;
+        if(!confirm("Adakah anda pasti? Ini akan menukar status semua peranti kepada 'Tersedia'.")) return;
         const res = await postData({ action: 'resetAll', password: sessionPass });
         alert(res.message);
         loadData();
